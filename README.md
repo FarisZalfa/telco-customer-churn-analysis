@@ -1,5 +1,5 @@
-# telco-customer-churn-analysis
-# 📊 Telco Customer Churn Analysis
+# telco-churn-sql-analysis
+# 📊 Telco Customer Churn Analysis | SQL Portfolio Project
 
 ![SQL](https://img.shields.io/badge/SQL-PostgreSQL-blue)
 ![Portfolio](https://img.shields.io/badge/Portfolio-Data%20Analyst-brightgreen)
@@ -23,21 +23,43 @@ Identified key factors driving customer churn and provided actionable insights.
 
 ## 📈 Key Findings
 
-| Finding | Insight | Business Impact |
-|--------|---------|-----------------|
-| **Month-to-month contracts** have 42% churn rate vs 11% for 1-year and 6% for 2-year | Customers need incentives to commit longer | Offer discounts for annual contracts |
-| **Fiber optic customers** churn at 41% vs 25% for DSL | Higher speed = higher expectations | Improve fiber optic reliability |
-| **Average monthly charges** for churned customers: $74 vs $61 for loyal customers | Price sensitivity | Review pricing strategy |
+| Finding | Result | Business Impact |
+|--------|--------|-----------------|
+| **Overall Churn Rate** | 26.5% | 1 in 4 customers leave - significant revenue loss |
+| **Month-to-Month Contracts** | 42.7% churn | Customers need incentives to commit longer |
+| **Fiber Optic Customers** | 41.9% churn | Higher expectations = need better reliability |
+| **Price Impact** | Churned customers pay $13 more/month | Price sensitivity is real |
+| **Senior Citizens** | 41.7% churn vs 23.6% for others | Target retention for seniors |
+
+## 💡 Business Recommendations
+1. Offer discounts for annual contracts to move customers from month-to-month
+2. Invest in fiber optic reliability - highest churn segment needs attention
+3. Create senior citizen retention program - they churn at nearly double the rate
+4. Review pricing strategy - price-sensitive customers need value packages
+
+## 🚀 How to Run This Project
+- Download dataset from Kaggle Telco Customer Churn
+- Create PostgreSQL table using provided schema
+- Import CSV data
+- Run analysis queries
 
 ## 🖥️ SQL Queries
 
 ```sql
--- Total customers and churn rate
+-- Overall Churn Rate
+ SELECT 
+       ROUND(100.0 * SUM(CASE WHEN churn = 'Yes' THEN 1 ELSE 0 END) / COUNT(*), 1) AS churn_rate
+   FROM customer_churn;
+
+-- Contract Type Analysis
 SELECT 
+    contract,
     COUNT(*) AS total_customers,
-    SUM(CASE WHEN churn = 'Yes' THEN 1 ELSE 0 END) AS churned_customers,
-    ROUND(100.0 * SUM(CASE WHEN churn = 'Yes' THEN 1 ELSE 0 END) / COUNT(*), 2) AS churn_rate_percent
-FROM customer_churn;
+    SUM(CASE WHEN churn = 'Yes' THEN 1 ELSE 0 END) AS churned,
+    ROUND(100.0 * SUM(CASE WHEN churn = 'Yes' THEN 1 ELSE 0 END) / COUNT(*), 2) AS churn_rate
+FROM customer_churn
+GROUP BY contract
+ORDER BY churn_rate DESC;
 
 -- Compare average spending between churned and stayed customers
 SELECT 
@@ -48,17 +70,7 @@ SELECT
 FROM customer_churn
 GROUP BY churn;
 
--- Contract analysis - this is GOLD for portfolio!
-SELECT 
-    contract,
-    COUNT(*) AS total_customers,
-    SUM(CASE WHEN churn = 'Yes' THEN 1 ELSE 0 END) AS churned,
-    ROUND(100.0 * SUM(CASE WHEN churn = 'Yes' THEN 1 ELSE 0 END) / COUNT(*), 2) AS churn_rate
-FROM customer_churn
-GROUP BY contract
-ORDER BY churn_rate DESC;
-
--- Does internet service type affect churn?
+-- Internet Service Impact
 SELECT 
     internetservice,
     COUNT(*) AS customers,
@@ -69,7 +81,7 @@ WHERE internetservice != 'No'  -- Exclude those without internet
 GROUP BY internetservice
 ORDER BY churn_rate DESC;
 
--- Do senior citizens churn more?
+-- Senior Citizen Analysis
 SELECT 
     CASE WHEN seniorcitizen = 1 THEN 'Senior' ELSE 'Non-Senior' END AS customer_type,
     COUNT(*) AS total,
