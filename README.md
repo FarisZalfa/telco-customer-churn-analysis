@@ -43,6 +43,9 @@ Identified key factors driving customer churn and provided actionable insights.
 - Import CSV data
 - Run analysis queries
 
+## 📁 Data Source
+Dataset: [Telco Customer Churn](https://www.kaggle.com/datasets/blastchar/telco-customer-churn)
+
 ## 🖥️ SQL Queries
 
 ```sql
